@@ -1,5 +1,4 @@
-import requests
-from bs4 import BeautifulSoup
+from googlesearch import search
 from flask import Flask
 
 app = Flask(__name__)
@@ -11,24 +10,12 @@ def get_url_from_file():
     return url
 
 def search_google(query):
-    # Google'da arama yapmak için URL oluştur
-    query = query.replace(' ', '+')
-    url = f'https://www.google.com/search?q={query}'
+    # googlesearch-python kullanarak ilk arama sonucunu al
+    search_results = search(query, num_results=1)
     
-    # Google sayfasını çek
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"}
-    response = requests.get(url, headers=headers)
-
-    # HTML içeriğini BeautifulSoup ile işleyelim
-    soup = BeautifulSoup(response.text, 'html.parser')
-
-    # İlk sonucu bulmak için HTML yapısında gezinelim (Google bazen sonuç yapısını değiştirir)
-    search_results = soup.find_all('a', href=True)
+    # İlk sonucu döndür
     for result in search_results:
-        link = result['href']
-        if "url?q=" in link:  # Google arama sonuç linkleri "url?q=" ile başlar
-            return link.split("url?q=")[1].split("&")[0]
+        return result
 
     return None
 
