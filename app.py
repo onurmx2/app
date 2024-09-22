@@ -1,5 +1,5 @@
 from googlesearch import search
-from flask import Flask
+from flask import Flask, redirect
 
 app = Flask(__name__)
 
@@ -28,9 +28,10 @@ def home():
     first_result_url = search_google(url_from_file)
     
     if first_result_url:
-        return f"First search result: <a href='{first_result_url}'>{first_result_url}</a>"
+        return redirect(first_result_url)  # Kullanıcıyı ilk çıkan sonuca yönlendir
     else:
         return "No search results found."
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
+
