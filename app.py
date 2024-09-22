@@ -1,5 +1,6 @@
 from googlesearch import search
 from flask import Flask, redirect
+import re
 
 app = Flask(__name__)
 
@@ -18,6 +19,16 @@ def search_google(query):
 
     return None
 
+def modify_title(title):
+    # Başlığın sonundan 25 karakter sil, sonra 'izle' ekle
+    if len(title) > 25:
+        modified_title = title[:-25]  # Son 25 karakteri sil
+    else:
+        modified_title = title  # Başlık zaten 25 karakterden kısaysa, olduğu gibi bırak
+
+    # Modifiye edilen başlığın sonuna 'izle' ekle
+    return f"{modified_title} izle"
+
 @app.route('/')
 def home():
     # data.txt dosyasından kelime alalım
@@ -27,14 +38,16 @@ def home():
     first_result_url = search_google(initial_query)
     
     if first_result_url:
-        # "izle" kelimesiyle tekrar arama yapalım
-        new_query = f"{initial_query} izle"
-        final_result_url = search_google(new_query)
+        # İlk başlığı modifiye edelim (başlığın sonundan 25 karakter sil ve 'izle' ekle)
+        modified_query = modify_title(initial_query)
+        
+        # Yeni arama yapalım
+        final_result_url = search_google(modified_query)
         
         if final_result_url:
             return redirect(final_result_url)  # Kullanıcıyı ilk çıkan sonuca yönlendir
         else:
-            return "No search results found after 'izle' query."
+            return "No search results found after modified query."
     else:
         return "No search results found for the initial query."
 
